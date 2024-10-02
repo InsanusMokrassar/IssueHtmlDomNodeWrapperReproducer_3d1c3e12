@@ -1,28 +1,37 @@
 import androidx.compose.runtime.*
-import org.jetbrains.compose.web.dom.Button
+import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.renderComposable
+import org.jetbrains.compose.web.renderComposableInBody
+
+private lateinit var composition: Composition
 
 fun main() {
-    renderComposable(rootElementId = "root") {
+    composition = renderComposableInBody {
         Body()
     }
 }
 
 @Composable
 fun Body() {
-    var counter by remember { mutableStateOf(0) }
-    Div {
-        Text("Clicked: ${counter}")
+    Div { Text("1 (Compose)") }
+    Div { Text("2 (Compose)") }
+    Div { Text("3 (Compose)") }
+
+    var counter by remember { mutableStateOf(3) }
+
+    remember(counter) {
+        window.setTimeout(
+            {
+                if (counter > 0) {
+                    counter--
+                } else {
+                    composition.dispose()
+                }
+            },
+            1000
+        )
     }
-    Button(
-        attrs = {
-            onClick { _ ->
-                counter++
-            }
-        }
-    ) {
-        Text("Click")
-    }
+
+    Div { Text(counter.toString()) }
 }
